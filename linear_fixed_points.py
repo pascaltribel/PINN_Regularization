@@ -53,10 +53,10 @@ def true_phase_portrait_A(A, ax=None):
         ax.set_ylim([-1.5, 1.5])
         ax.set_title("Reference")
 
-n_points = 50 #00
-n_epochs = 10 #000
+n_points = 1024
+n_epochs = 1024
 
-T_MAX = 3.
+T_MAX = 2.
 #A = np.array([[1, 1], [-1, 1]])
 #c_is = [[-0.5,-0.5], [-0.5,0.5], [0.5,-0.5], [0.5,0.5]]
 
