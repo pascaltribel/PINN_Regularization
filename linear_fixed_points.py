@@ -53,12 +53,12 @@ def true_phase_portrait_A(A, ax=None):
         ax.set_ylim([-1.5, 1.5])
         ax.set_title("Reference")
 
-n_points = 10#24
-n_epochs = 10#24
+n_points = 50 #00
+n_epochs = 10 #000
 
-T_MAX = 2.
-A = np.array([[1, 1], [-1, 1]])
-c_is = [[-0.5,-0.5], [-0.5,0.5], [0.5,-0.5], [0.5,0.5]]
+T_MAX = 3.
+#A = np.array([[1, 1], [-1, 1]])
+#c_is = [[-0.5,-0.5], [-0.5,0.5], [0.5,-0.5], [0.5,0.5]]
 
 #plt.figure(figsize=(10, 10))
 #for c_i in c_is:
@@ -301,7 +301,7 @@ def get_distance_with_true_fixed_point(model):
     root = fsolve(residual_np, x0=[0, 0], args=(model, 0.0))
     return (root[0]**2 + root[1]**2)**0.5
 
-n_trials = 10
+n_trials = 5
 
 As = []
 models_1 = []
