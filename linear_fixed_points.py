@@ -13,7 +13,7 @@ from pcgrad import PCGrad
 import pandas as pd
 import seaborn as sns
 import sympy as sp
-torch.set_default_device('mps')
+torch.set_default_device('cuda')
 
 def get_sol(A, interval, c_i):
     def xdot(t, x):
