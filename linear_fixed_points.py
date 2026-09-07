@@ -301,7 +301,7 @@ def get_distance_with_true_fixed_point(model):
     root = fsolve(residual_np, x0=[0, 0], args=(model, 0.0))
     return (root[0]**2 + root[1]**2)**0.5
 
-n_trials = 5
+n_trials = 50
 
 As = []
 models_1 = []
