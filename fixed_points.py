@@ -93,21 +93,17 @@ def evaluate_model_on_trajectories(model, references):
             error += ((y_hat-y).abs()).mean()
     return error.item()/references.shape[0]
 
-def g_at_tau0(model, x1_0, x2_0):
-    ones = torch.ones_like(x1_0)
-    return model(ones, 0*ones, x1_0, x2_0).cpu()
-
-def residual_np(xy, model, t0_scalar):
+def u_tau(xy, model):
     x1_0 = torch.tensor([[xy[0]]], dtype=torch.float32)
     x2_0 = torch.tensor([[xy[1]]], dtype=torch.float32)
     with torch.no_grad():
-        F = g_at_tau0(model, x1_0, x2_0)
-    return F.squeeze(0).numpy()
+        ones = torch.ones_like(x1_0)
+        F = model(ones, 0*ones, x1_0, x2_0).cpu()
+    return F.squeeze(0).numpy() - xy
 
-def get_distance_with_true_fixed_point(model, mu):
-    root = fsolve(residual_np, x0=[0, 0], args=(model, 0.0))
-    x1_0, x2_0 = get_roots(mu)[0]
-    return ((root[0]-x1_0)**2 + (root[1]-x2_0)**2)**0.5
+def get_distance_with_true_fixed_point(model):
+    root = fsolve(u_tau, x0=[0, 0], args=(model))
+    return (root[0]**2 + root[1]**2)**0.5
 
 def model_trajectory(model, interval: list[int], c_i: list[int], ax=None, color='black') -> None:
     t_eval = torch.linspace(interval[0], interval[1], 250).unsqueeze(-1)

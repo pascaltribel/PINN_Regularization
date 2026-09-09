@@ -13,7 +13,7 @@ from pcgrad import PCGrad
 import pandas as pd
 import seaborn as sns
 import sympy as sp
-torch.set_default_device('mps')
+torch.set_default_device('cuda')
 
 def get_sol(A, interval, c_i):
     def xdot(t, x):
@@ -53,12 +53,12 @@ def true_phase_portrait_A(A, ax=None):
         ax.set_ylim([-1.5, 1.5])
         ax.set_title("Reference")
 
-n_points = 10#24
-n_epochs = 10#24
+n_points = 1024
+n_epochs = 1024
 
 T_MAX = 2.
-A = np.array([[1, 1], [-1, 1]])
-c_is = [[-0.5,-0.5], [-0.5,0.5], [0.5,-0.5], [0.5,0.5]]
+#A = np.array([[1, 1], [-1, 1]])
+#c_is = [[-0.5,-0.5], [-0.5,0.5], [0.5,-0.5], [0.5,0.5]]
 
 #plt.figure(figsize=(10, 10))
 #for c_i in c_is:
@@ -286,22 +286,19 @@ def evaluate_model_on_trajectories(model, references):
             error += ((y_hat-y).abs()).mean()
     return error.item()/references.shape[0]
 
-def g_at_tau0(model, x1_0, x2_0):
-    ones = torch.ones_like(x1_0)
-    return model(ones, 0*ones, x1_0, x2_0).cpu()
-
-def residual_np(xy, model, t0_scalar):
+def u_tau(xy, model):
     x1_0 = torch.tensor([[xy[0]]], dtype=torch.float32)
     x2_0 = torch.tensor([[xy[1]]], dtype=torch.float32)
     with torch.no_grad():
-        F = g_at_tau0(model, x1_0, x2_0)
-    return F.squeeze(0).numpy()
+        ones = torch.ones_like(x1_0)
+        F = model(ones, 0*ones, x1_0, x2_0).cpu()
+    return F.squeeze(0).numpy() - xy
 
 def get_distance_with_true_fixed_point(model):
-    root = fsolve(residual_np, x0=[0, 0], args=(model, 0.0))
+    root = fsolve(u_tau, x0=[0, 0], args=(model))
     return (root[0]**2 + root[1]**2)**0.5
 
-n_trials = 10
+n_trials = 50
 
 As = []
 models_1 = []
