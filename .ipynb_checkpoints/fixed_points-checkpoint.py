@@ -101,10 +101,11 @@ def u_tau(xy, model):
         F = model(ones, 0*ones, x1_0, x2_0).cpu()
     return F.squeeze(0).numpy() - xy
 
-def get_distance_with_true_fixed_point(model):
+def get_distance_with_true_fixed_point(model, mu):
     root = fsolve(u_tau, x0=[0, 0], args=(model))
-    return (root[0]**2 + root[1]**2)**0.5
-
+    x1_0, x2_0 = get_roots(mu)[0]
+    return ((root[0]-x1_0)**2 + (root[1]-x2_0)**2)**0.5
+    
 def model_trajectory(model, interval: list[int], c_i: list[int], ax=None, color='black') -> None:
     t_eval = torch.linspace(interval[0], interval[1], 250).unsqueeze(-1)
     x1x2 = model(t_eval, torch.zeros_like(t_eval), torch.ones_like(t_eval)*c_i[0], torch.ones_like(t_eval)*c_i[1]).detach().cpu().squeeze().numpy()
@@ -273,12 +274,6 @@ n_points = 5000
 n_epochs = 10000
 n_cv = 5
 mus = np.arange(-1, 1.1, 0.2)
-
-#true_phase_portrait(mu)
-#roots = get_roots(mu)
-#for root in roots:
-#    plt.scatter(root[0], root[1], marker='x')
-#plt.show()
 
 results = {mu: [[], []] for mu in mus}
 for mu in tqdm(mus):
